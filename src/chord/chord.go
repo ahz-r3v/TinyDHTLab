@@ -1,19 +1,19 @@
 package chord
 
 import(
-	"net"
+	// "net"
 	"net/rpc"
-	"log"
+	// "log"
 )
 
 type Chord struct{
-	Peers	[] *rpc.ClientEnd // RPC end points of all peers
-	NodeID	int			// 该节点的唯一ID
-	Location int		// 该节点在环上的位置
-	Prev	int			// 前置节点的位置
+	Peers	[]*rpc.Client 	// RPC end points of all peers
+	NodeID	int				// 该节点的唯一ID
+	Location int			// 该节点在环上的位置
+	Prev	int				// 前置节点的位置
 	Succ	int 			// 后继节点的位置
 	
-	Key		[]int		// 用于保存key
+	Key		[]int			// 用于保存key
 	Value	[]string		// 用于保存value
 	Size	int 			// 表示该节点已经存储的大小
 
@@ -21,7 +21,7 @@ type Chord struct{
 }
 
 //
-// RPC for chord
+// RPC Args for chord
 //
 type GetLocationArgs struct{
 	NodeID int
@@ -31,7 +31,7 @@ type GetLocationReply struct{
 	Location int
 }
 
-func (chd *Chord) SendGetLocation(node int, args *GetLocationArgs , reply *GetLocationReply) bool {
+func (chd *Chord) SendGetLocation(node int, args *GetLocationArgs , reply *GetLocationReply) error {
     ok := chd.Peers[node].Call("Chord.GetLocation", args, reply)
 	return ok
 }
@@ -60,10 +60,10 @@ func get(key int){
 //
 // bit is a number indicating how many bits the hash function will use
 //
-func Make(nodeID int, peers) *Chord {
+func Make(nodeID int) *Chord {
 	chd := &Chord{}
 	chd.NodeID = nodeID
-	chd.Peers = peers
+	// chd.Peers = peers
 	chd.Location = naiveHash(nodeID)
 	return chd
 }
