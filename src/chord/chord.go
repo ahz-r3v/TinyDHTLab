@@ -3,11 +3,14 @@ package chord
 import(
 	// "net"
 	"net/rpc"
+	"fmt"
 	// "log"
 )
 
 type Chord struct{
 	Peers	[]*rpc.Client 	// RPC end points of all peers
+	Others	[]int
+
 	NodeID	int				// 该节点的唯一ID
 	Location int			// 该节点在环上的位置
 	Prev	int				// 前置节点的位置
@@ -60,10 +63,11 @@ func get(key int){
 //
 // bit is a number indicating how many bits the hash function will use
 //
-func Make(nodeID int) *Chord {
+func Make(nodeID int, peers []*rpc.Client, otherID []int) *Chord {
 	chd := &Chord{}
 	chd.NodeID = nodeID
-	// chd.Peers = peers
+	chd.Peers = peers
+	chd.Others = otherID
 	chd.Location = naiveHash(nodeID)
 	return chd
 }
@@ -85,4 +89,10 @@ func fillFingerTable(){
 
 func naiveHash(val int) int {
 	return ((val * 1919810) / 114514) % 65536
+}
+
+func (chd *Chord) hello(){
+	for i:=0;i<3;i++{
+		fmt.Println(chd.Others[i])
+	}
 }

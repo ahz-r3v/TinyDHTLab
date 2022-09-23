@@ -1,45 +1,45 @@
 package chord
 
 import (
-	"bytes"
-	"fmt"
 	"math/rand"
-	"os/exec"
-	"regexp"
-	"strconv"
-	"strings"
+	"net/rpc"
 )
 
 type Test struct{
 	NodesID []int
+	Nodes 	[]*Chord
+	Network []*rpc.Client
 }
 
-func (test *Test) makeNodeID(num int){		//NodeID与RPC端口绑定（同构）
+var portStart = 9900
+
+//
+// generate nodes and network for tester to use. (Attention: NodeID == NodePort)
+//
+func (test *Test) makeNodes(num int) (bool) {
+	test.Nodes = make([]*Chord, num)
+	test.Network = make([]*rpc.Client, num)
+	test.NodesID = make([]int, num)
+	test.makeNodeID(num)										// genarating NodeID
 	for i:=0;i<num;i++ {
-	    test.NodesID[i] = rand.Intn(65535)
-	    if PortAvailable(test.NodesID[i]) {	//如果端口被占用着，换一个
-			i--
-			continue
-	    }
+		test.Nodes[i] = Make(test.NodesID[i], test.Network, test.NodesID)		// make n nodes
+		registRPCserver(test.Nodes[i], test.NodesID[i])			// register rpc
+		test.Network[i] = connectRPCserver(test.NodesID[i])		// connect rpc
 	}
+	return true
 }
 
-//
-// 检查端口是否被占用
-//
-func PortAvailable(port int) bool {
-    checkStatement := fmt.Sprintf(`netstat -apt | grep -q %d ; echo $?`, port)
-    output, err := exec.Command("sh", "-c", checkStatement).CombinedOutput()
-    if err != nil {
-        return false
-    }
-    result, err := strconv.Atoi(strings.TrimSuffix(string(output), "n"))
-    if err != nil {
-        return false
-    }
-    if result == 0 {	// 0代表不可用，1代表可用
-        return false
-    }
-
-    return true
+// 
+// generate NodeID. (Attention: NodeID == NodePort)
+// 
+func (test *Test) makeNodeID(num int){		// NodeID与RPC端口绑定（同构）
+	for i:=0;i<num;i++ {
+	    test.NodesID[i] = rand.Intn(1000) + 9000
+		for j:=0;j<i;j++ {					// 如果已经被用了，也换一个
+			if test.NodesID[j] == test.NodesID[i]{
+				i--
+				continue
+			}
+		}
+	}
 }
