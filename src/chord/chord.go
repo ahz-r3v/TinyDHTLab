@@ -349,7 +349,9 @@ func Make(nodeID string, peers []*labrpc.ClientEnd, otherID []string, self int) 
 	return chd
 }
 
-// 
+ 
+//
+// ******* BELOW ARE CODES ONLY FOR TEST ********
 // for a given node index(int), find his prev and succ node.
 // first return value is the prev, second return value is the succ
 //
@@ -367,8 +369,6 @@ func fillFingerTable(){
 func naiveHash(val int) int {
 	return ((val * 1919810) / 114514) % 65536
 }
-
-
 
 func (chd *Chord) Tellself (args int, reply int) (string) {
 	return chd.NodeID
