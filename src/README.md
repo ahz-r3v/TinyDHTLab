@@ -19,9 +19,9 @@
 
 ### P2P架构
 
-![Untitled](../Untitled1.png)
+![Untitled](../pics/Untitled1.png)
 
-![Untitled](../Untitled2.png)
+![Untitled](../pics/Untitled2.png)
 
 P2P的物理网络理论上是：
 
