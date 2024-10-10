@@ -6,6 +6,7 @@ import (
 	// "fmt"
 	"sync"
 	"time"
+	"errors"
 	// "log"
 )
 
@@ -37,6 +38,9 @@ func (chd *Chord) Killed() bool {
 	return chd.killed
 }
 
+func (chd *Chord) hash(k string) int {
+	return BKDRHash(k)
+}
 
 //
 // RPC methods for chord
@@ -100,6 +104,7 @@ type HandleEntryArgs struct {
 type HandleEntryReply struct {
 	Confirm bool
 	Value string
+	Err error
 	Location int
 	EndIndex int
 }
@@ -114,7 +119,7 @@ func (chd *Chord) HandleEntry(args *HandleEntryArgs, reply *HandleEntryReply){
 		// fmt.Println("<RPC> Put request from:",args.From,"to:",chd.selfIndex)
 		chd.put(args.Key, args.Value)
 	} else if args.Function == "get" {
-		reply.Value = chd.get(args.Key)
+		reply.Value, reply.Err = chd.get(args.Key)
 	}
 	reply.Confirm = true
 } 
@@ -169,14 +174,14 @@ func (chd *Chord) put(key string, value string) {
 	}
 }
 
-func (chd *Chord) get(key string) string {
+func (chd *Chord) get(key string) (string, error) {
 	hash := BKDRHash(key) % 65536
 	switch {
 	case chd.PrevLocation < chd.Location:
 		if hash > chd.PrevLocation && hash < chd.Location {
 			v, ok := chd.Map[key]
 			if ok {
-				return v
+				return v, nil
 			}
 		} else {
 			args  := &HandleEntryArgs{
@@ -189,7 +194,7 @@ func (chd *Chord) get(key string) string {
 			ok := chd.SendHandleEntry(chd.SuccEndIndex, args, reply)
 			chd.mu.Unlock()
 			if ok {
-				return reply.Value
+				return reply.Value, reply.Err
 			}
 		}
 		break
@@ -197,7 +202,7 @@ func (chd *Chord) get(key string) string {
 		if hash > chd.PrevLocation || hash < chd.Location {
 			v, ok := chd.Map[key]
 			if ok {
-				return v
+				return v, nil
 			}
 		} else {
 			args  := &HandleEntryArgs{
@@ -210,14 +215,14 @@ func (chd *Chord) get(key string) string {
 			ok := chd.SendHandleEntry(chd.SuccEndIndex, args, reply)
 			chd.mu.Unlock()
 			if ok {
-				return reply.Value
+				return reply.Value, reply.Err
 			}
 		}
 		break
 	default:
 		// fmt.Println("This should not be printed.")
 	}
-	return "No Result!"
+	return "", errors.New("No record!")
 }
 
 // func (chd *Chord) find(key string){
@@ -364,10 +369,6 @@ func getLocation(index int)(int, int){
 
 func fillFingerTable(){
 
-}
-
-func naiveHash(val int) int {
-	return ((val * 1919810) / 114514) % 65536
 }
 
 func (chd *Chord) Tellself (args int, reply int) (string) {
