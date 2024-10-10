@@ -25,4 +25,4 @@ A distribute hash table learning project based on Chord protocol.
 - 对称的（如果A能访问B，则B也能访问A）。
 - 可传递的（如果A能访问B，B能访问C，则A也能访问C）。
 
-[分享会](%E5%88%86%E5%B8%83%E5%BC%8F%E5%93%88%E5%B8%8C%E8%A1%A8%20d956918f4afe475f9c080febdea049ca/%E5%88%86%E4%BA%AB%E4%BC%9A%20354b7f673c8a4937889fe96891f69fdd.md)
+[分享会](./src/README.md)

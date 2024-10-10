@@ -15,13 +15,13 @@
 
 ### C/S架构
 
-![Untitled](%E5%88%86%E4%BA%AB%E4%BC%9A%20354b7f673c8a4937889fe96891f69fdd/Untitled.png)
+![Untitled](../pics/Untitled.png)
 
 ### P2P架构
 
-![Untitled](%E5%88%86%E4%BA%AB%E4%BC%9A%20354b7f673c8a4937889fe96891f69fdd/Untitled%201.png)
+![Untitled](../Untitled1.png)
 
-![Untitled](%E5%88%86%E4%BA%AB%E4%BC%9A%20354b7f673c8a4937889fe96891f69fdd/Untitled%202.png)
+![Untitled](../Untitled2.png)
 
 P2P的物理网络理论上是：
 
